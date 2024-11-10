@@ -4,13 +4,13 @@ import slice
 type
      # Ввод вывод в память
      Memory* = object
-          # Буффер куда записываются данные
-          buffer:pointer
           # Ввод-вывод          
-          io:io.IO
+          io:io.IOSized
+          # Буффер куда записываются данные
+          buffer:pointer          
 
 # Преобразует в IO
-converter toIO*(this:Memory):io.IO =
+converter toIO*(this:Memory):io.IOSized =
      return this.io
 
 # Преобразует в IReader
@@ -34,10 +34,11 @@ proc newMemory*():Memory =
      var buffer = allocShared(0)
      return Memory(
           buffer: buffer,
-          io: io.newIO(
+          io: io.newIOSized(
                reader = newMemoryReader(buffer),
-               writer = newMemoryWriter(buffer),          
-          )
+               writer = newMemoryWriter(buffer),
+               #sized = newSized()
+          ),          
      )
      
 # Возвращает срез для буффера в памяти
