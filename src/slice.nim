@@ -19,13 +19,28 @@ proc newSlice*[T](size:Positive):Slice[T] =
     len:size
   )
 
-# Создаёт срез байт
+# Создаёт срез байт заданного размера
 proc newBytes*(size:Positive):Bytes =
   return newSlice[uint8](size)
+
+# Создаёт срез байт из буффера
+proc newBytes*(data:pointer, pos:Natural, len:Natural):Bytes =
+  return Bytes(
+    data:cast[ptr UncheckedArray[uint8]](data),
+    pos:pos,
+    len:len
+  )
 
 # Уничтожает срез
 proc `=destroy`*[T](x: Slice[T]) =
   deallocShared(x.data)
+
+# Сравнивает два среза байт
+proc `==`*(this:Bytes, other:Bytes):bool =
+  if this.len != other.len:
+    return false
+
+  return cmpMem(this.data[this.pos].addr, other.data[other.pos].addr, other.len) == 0  
 
 # заполняет срез значениями
 proc fill*[T](this:Slice[T], value:T) =

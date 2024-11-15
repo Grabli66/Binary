@@ -30,6 +30,14 @@ converter toIReader*(this:Memory):IReader =
 converter toIWriter*(this:Memory):IWriter =
      return this.io
 
+# Подготавливает буффер для записи
+proc prepareSize(memdata:MemoryData, size:Natural):void =     
+     let totalSize = memdata.pos + size
+     if totalSize < memdata.len:
+          return
+     memdata.buffer = reallocShared(memdata.buffer, totalSize)
+     memdata.len = totalSize
+
 # Создаёт интерфейс чтения из памяти
 proc newMemoryReader(memdata:MemoryData):io.IReader =
      return io.newIReader(
@@ -40,7 +48,9 @@ proc newMemoryReader(memdata:MemoryData):io.IReader =
 proc newMemoryWriter(memdata:MemoryData):io.IWriter =
      return io.newIWriter(
           write = proc(data:Bytes):void =
+               prepareSize(memdata, data.len)
                copyMem(memdata.buffer, data.toUnsafe(), data.len)
+               memdata.pos += data.len
      )
 
 # Создаёт интерфейс для ISizedStream
@@ -75,5 +85,5 @@ proc pos*(this:Memory):Natural =
      return this.data.pos
 
 # Возвращает срез для буффера в памяти
-proc toSlice*[T](this:Memory):slice.Bytes =
-     discard
+proc toSlice*(this:Memory):slice.Bytes =
+     return slice.newBytes(this.data.buffer, 0, this.len)

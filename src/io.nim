@@ -124,6 +124,10 @@ proc newIOSized*(reader:IReader,writer:IWriter,sized:ISizedStream):IOSized =
 proc getLength*(this:ISizedStream):Natural =
     return this.getLength()
 
+# Перенаправляет в IWriter
+proc write*(this:IWriter, data:Bytes):void =
+    this.write(data)
+
 # Читает возвращает срез байт
 proc readSlice*(this:IReader, size:Natural):Bytes =
     return this.readSlice(size)
