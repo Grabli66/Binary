@@ -21,10 +21,14 @@ test "fill slice":
 
   check checked
 
-test "memory create":
-  const size = 10
-  var mem = newMemory(size)
+test "memory create":  
+  var mem = newMemory(10)
   check mem.len == 0
+
+test "memory set/get pos":
+  var mem = newMemory(10)
+  mem.pos = 7
+  check mem.pos == 7
 
 test "memory write":
   var mem = newMemory(10)

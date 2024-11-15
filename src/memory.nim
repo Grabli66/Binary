@@ -14,12 +14,12 @@ type
      # Ввод вывод в память
      Memory* = object
           # Ввод-вывод          
-          io:io.IOSized   
+          io:IOSized   
           # Поля данных
           data:MemoryData
 
 # Преобразует в IO
-converter toIO*(this:Memory):io.IOSized =
+converter toIO*(this:Memory):IOSized =
      return this.io
 
 # Преобразует в IReader
@@ -28,6 +28,14 @@ converter toIReader*(this:Memory):IReader =
 
 # Преобразует в IWriter
 converter toIWriter*(this:Memory):IWriter =
+     return this.io
+
+# Преобразует в IOSized
+converter toIOSized*(this:Memory):IOSized =
+     return this.io
+
+# Преобразует в ISizedStream
+converter toISizedStream*(this:Memory):ISizedStream =
      return this.io
 
 # Подготавливает буффер для записи
@@ -58,6 +66,15 @@ proc newSized(memdata:MemoryData):io.ISizedStream =
      return newISizedStream(
           getLength = proc():Natural =
                return memdata.len
+          ,
+          rewind = proc():void =
+               memdata.len = 0
+          ,
+          getPos = proc():Natural =
+               return memdata.pos
+          ,
+          setPos = proc(pos:Natural):void =
+               memdata.pos = pos
      )
 
 # Создаёт новый ввод-вывод в память

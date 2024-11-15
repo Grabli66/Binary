@@ -1,7 +1,7 @@
 import io
-import memory
 import slice
+import memory
 
 export io
-export memory
 export slice
+export memory

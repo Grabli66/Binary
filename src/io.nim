@@ -89,9 +89,16 @@ converter toISizedStream*(this:IOSized):ISizedStream =
 
 # Создаёт новое ISizedStream
 proc newISizedStream*(
-        getLength:proc():Natural):ISizedStream =
+        getLength:proc():Natural,
+        rewind:proc():void,
+        getPos:proc():Natural,
+        setPos:proc(pos:Natural):void
+            ):ISizedStream =
     return ISizedStream(
-        getLength:getLength
+        getLength:getLength,
+        rewind:rewind,
+        getPos:getPos,
+        setPos:setPos
     )
 
 # Создаёт новый IReader
@@ -123,6 +130,18 @@ proc newIOSized*(reader:IReader,writer:IWriter,sized:ISizedStream):IOSized =
 # Перенаправляет в ISizedStream
 proc getLength*(this:ISizedStream):Natural =
     return this.getLength()
+
+# Перенаправляет в ISizedStream
+proc rewind*(this:ISizedStream):void =
+    this.rewind()
+
+# Перенаправляет в ISizedStream
+proc pos*(this:ISizedStream):Natural =
+    return this.getPos()
+
+# Перенаправляет в ISizedStream
+proc `pos=`*(this:ISizedStream, value:Natural):void =
+    this.setPos(value)
 
 # Перенаправляет в IWriter
 proc write*(this:IWriter, data:Bytes):void =
