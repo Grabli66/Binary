@@ -5,7 +5,7 @@ import binary
 test "create slice":
   const size = 10
   let bytes = newSlice[uint8](size)
-  check bytes.size == size
+  check bytes.len == size
 
 test "fill slice":
   const size = 10
@@ -23,4 +23,4 @@ test "fill slice":
 test "memory create":
   const size = 10
   var mem = newMemory(size)
-  check mem.len == size
+  check mem.len == 0

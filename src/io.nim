@@ -88,9 +88,21 @@ converter toISizedStream*(this:IOSized):ISizedStream =
     return this.sized
 
 # Создаёт новое ISizedStream
-proc newISizedStream*():ISizedStream =
+proc newISizedStream*(
+        getLength:proc():Natural):ISizedStream =
     return ISizedStream(
+        getLength:getLength
+    )
 
+# Создаёт новый IReader
+proc newIReader*():IReader =
+    return IReader()
+
+# Создаёт новый IWriter
+proc newIWriter*(
+        write:proc(data:Bytes):void):IWriter =
+    return IWriter(
+        write:write
     )
 
 # Создаёт новое IO
@@ -115,7 +127,3 @@ proc getLength*(this:ISizedStream):Natural =
 # Читает возвращает срез байт
 proc readSlice*(this:IReader, size:Natural):Bytes =
     return this.readSlice(size)
-
-# Возвращает интерфейс IOSized
-proc sized*(this:IOSized):ISizedStream =
-    return this.sized

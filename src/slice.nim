@@ -6,7 +6,7 @@ type
     # Начальная позиция
     pos:Natural
     # Размер среза
-    size:Natural
+    len:Natural
 
   # Срез массива байт
   Bytes* = Slice[uint8]
@@ -16,7 +16,7 @@ proc newSlice*[T](size:Positive):Slice[T] =
   return Slice[T](
     data:cast[ptr UncheckedArray[T]](createShared(T, size)),
     pos:0,
-    size:size
+    len:size
   )
 
 # Создаёт срез байт
@@ -29,7 +29,7 @@ proc `=destroy`*[T](x: Slice[T]) =
 
 # заполняет срез значениями
 proc fill*[T](this:Slice[T], value:T) =
-  for i in this.pos..<this.size:
+  for i in this.pos..<this.len:
     this.data[this.pos+i] = value
 
 # Возвращает элемент среза
@@ -41,5 +41,9 @@ proc `[]=`*[T](this:Slice[T], pos:Natural, value:T) =
   this.data[pos] = value
 
 # Возвращает размер среза
-proc size*[T](this:Slice[T]):Natural =
-    return this.size
+proc len*[T](this:Slice[T]):Natural =
+    return this.len
+
+# Возвращает буффер небезопасным способом
+proc toUnsafe*[T](this:Slice[T]):pointer =
+  return this.data
