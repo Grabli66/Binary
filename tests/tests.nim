@@ -19,3 +19,8 @@ test "fill slice":
       break
 
   check checked
+
+test "memory create":
+  const size = 10
+  var mem = newMemory(size)
+  check mem.len == size

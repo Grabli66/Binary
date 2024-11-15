@@ -29,18 +29,26 @@ proc newMemoryReader(buffer:pointer):io.IReader =
 proc newMemoryWriter(buffer:pointer):io.IWriter =
      discard
 
+# Создаёт интерфейс для ISizedStream
+proc newSized():io.ISizedStream =
+     discard
+
 # Создаёт новый ввод-вывод в память
-proc newMemory*():Memory =
-     var buffer = allocShared(0)
-     return Memory(
-          buffer: buffer,
+proc newMemory*(capacity = 0):Memory =
+     var buffer = allocShared(capacity)
+     return Memory(          
           io: io.newIOSized(
                reader = newMemoryReader(buffer),
                writer = newMemoryWriter(buffer),
-               #sized = newSized()
-          ),          
+               sized = newSized()
+          ),
+          buffer: buffer,
      )
-     
+
+# Возвращает длину данных
+proc len*(this:Memory):Natural =
+     return this.io.sized.getLength()
+
 # Возвращает срез для буффера в памяти
 proc toSlice*[T](this:Memory):slice.Bytes =
      discard
