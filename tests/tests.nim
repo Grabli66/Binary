@@ -35,6 +35,6 @@ test "memory write":
   var bytes = newBytes(5)
   bytes.fill(33)
 
-  mem.write(bytes)
+  mem.writeBytes(bytes)
   var slice = mem.toSlice()
   check slice == bytes

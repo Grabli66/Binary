@@ -21,24 +21,12 @@ type
         # Читает uin16
         readUInt16:proc(endian:Endianness):uint16
 
-    # Интерфейс для чтения данных с известной длиной
-    IReaderSized* = object
-        # Читает данные
-        reader:IReader   
-        # Определяет позицию и размер потока
-        sized:ISizedStream
-
     # Интерфейс для записи данные
-    IWriter* = object
+    IWriter* = object        
         # Записывает срез байт
-        write:proc(data:Bytes):void
-
-    # Интерфейс для записи данные с известной длиной
-    IWriterSized* = object
-        # Записывает данные
-        writer:IWriter
-        # Определяет позицию и размер потока
-        sized:ISizedStream
+        writeBytes:proc(data:Bytes):void        
+        # Записывает UInt8
+        writeUInt8:proc(value:uint8):void
 
     # Ввод-вывод
     IO* = object
@@ -63,10 +51,6 @@ converter toIReader*(this:IO):IReader =
 # Преобразует IOSized в IReader
 converter toIReader*(this:IOSized):IReader =
      return this.reader
-
-# Преобразует IReaderSized в IReader
-converter toIReader*(this:IReaderSized):IReader =
-     return this.reader    
 
 # Преобразует IO в IWriter
 converter toIWriter*(this:IO):IWriter =
@@ -107,9 +91,9 @@ proc newIReader*():IReader =
 
 # Создаёт новый IWriter
 proc newIWriter*(
-        write:proc(data:Bytes):void):IWriter =
+        writeBytes:proc(data:Bytes):void):IWriter =
     return IWriter(
-        write:write
+        writeBytes:writeBytes
     )
 
 # Создаёт новое IO
@@ -144,8 +128,8 @@ proc `pos=`*(this:ISizedStream, value:Natural):void =
     this.setPos(value)
 
 # Перенаправляет в IWriter
-proc write*(this:IWriter, data:Bytes):void =
-    this.write(data)
+proc writeBytes*(this:IWriter, data:Bytes):void =
+    this.writeBytes(data)
 
 # Читает возвращает срез байт
 proc readSlice*(this:IReader, size:Natural):Bytes =

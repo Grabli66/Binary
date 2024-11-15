@@ -55,7 +55,7 @@ proc newMemoryReader(memdata:MemoryData):io.IReader =
 # Создаёт интерфейс записи в память
 proc newMemoryWriter(memdata:MemoryData):io.IWriter =
      return io.newIWriter(
-          write = proc(data:Bytes):void =
+          writeBytes = proc(data:Bytes):void =
                prepareSize(memdata, data.len)
                copyMem(memdata.buffer, data.toUnsafe(), data.len)
                memdata.pos += data.len
