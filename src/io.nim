@@ -1,6 +1,12 @@
 import slice
 
 type
+    # Байт
+    SomeByte = uint8|int8
+
+    # Число, но не байт
+    SomeNotByteNumber = uint16|int16|uint32|int32|uint64|int64|float32|float64
+
     # Интерфейс потока данных с известным количеством данных
     ISizedStream* = object
         # Возвращает количество читаемых данных
@@ -131,16 +137,27 @@ proc rewind*(this:ISizedStream):void =
 proc writeBytes*(this:IWriter, data:Bytes):void =
     this.writeBytes(data)
 
-# Записывает значение через IWriter
-proc write*(this:IWriter, T:typedesc[SomeNumber], value:T):void =
+# Записывает SomeByte значение через IWriter
+proc write*(this:IWriter, T:typedesc[SomeByte], value:T):void =
     when T is uint8:
         this.writeUInt8(value)
+    when T is int8:
+        this.writeUInt8(value.uint8)
 
 # Читает возвращает срез байт
 proc readSlice*(this:IReader, size:Natural):Bytes =
     return this.readSlice(size)
 
-# Читает значение через IReader
-proc read*(this:IReader, T:typedesc[SomeNumber]):T =
+# Читает значение SomeByte через IReader
+proc read*(this:IReader, T:typedesc[SomeByte]):T =
     when T is uint8:
         return this.readUInt8()
+    when T is int8:
+        return this.readUInt8().int8
+
+# Читает значение SomeNotByteNumber через IReader
+proc read*(this:IReader, T:typedesc[SomeNotByteNumber], endian:Endianness):T =
+    when T is uint16:
+        return this.readUint16(endian)
+    when T is int16:
+        return this.readUint16(endian).int16
