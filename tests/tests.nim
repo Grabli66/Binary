@@ -30,7 +30,7 @@ test "memory set/get pos":
   mem.pos = 7
   check mem.pos == 7
 
-test "memory write":
+test "memory write bytes":
   var mem = newMemory(10)
   var bytes = newBytes(5)
   bytes.fill(33)
@@ -38,3 +38,17 @@ test "memory write":
   mem.writeBytes(bytes)
   var slice = mem.toSlice()
   check slice == bytes
+
+test "memory write uint8":
+  var mem = newMemory(10)
+  mem.write(uint8, 10)
+  var sl = mem.toSlice()
+  check sl[0] == 10
+
+test "memory read uint8":
+  var mem = newMemory(10)
+  const fillBt = 0x03u8
+  mem.fill(fillBt)
+  mem.rewind()
+  let bt = mem.read(uint8)
+  check bt == fillBt

@@ -5,8 +5,6 @@ type
     ISizedStream* = object
         # Возвращает количество читаемых данных
         getLength:proc():Natural
-        # Перематывает в самое начал
-        rewind:proc():void
         # Возвращает позицию для чтения
         getPos:proc():Natural
         # Устанавливает позицию для чтения
@@ -74,26 +72,28 @@ converter toISizedStream*(this:IOSized):ISizedStream =
 # Создаёт новое ISizedStream
 proc newISizedStream*(
         getLength:proc():Natural,
-        rewind:proc():void,
         getPos:proc():Natural,
         setPos:proc(pos:Natural):void
             ):ISizedStream =
     return ISizedStream(
-        getLength:getLength,
-        rewind:rewind,
+        getLength:getLength,        
         getPos:getPos,
         setPos:setPos
     )
 
 # Создаёт новый IReader
-proc newIReader*():IReader =
-    return IReader()
+proc newIReader*(readUInt8:proc():uint8):IReader =
+    return IReader(
+        readUInt8:readUInt8
+    )
 
 # Создаёт новый IWriter
 proc newIWriter*(
-        writeBytes:proc(data:Bytes):void):IWriter =
+        writeBytes:proc(data:Bytes):void,
+        writeUInt8:proc(value:uint8):void):IWriter =
     return IWriter(
-        writeBytes:writeBytes
+        writeBytes:writeBytes,
+        writeUInt8:writeUInt8
     )
 
 # Создаёт новое IO
@@ -116,10 +116,6 @@ proc getLength*(this:ISizedStream):Natural =
     return this.getLength()
 
 # Перенаправляет в ISizedStream
-proc rewind*(this:ISizedStream):void =
-    this.rewind()
-
-# Перенаправляет в ISizedStream
 proc pos*(this:ISizedStream):Natural =
     return this.getPos()
 
@@ -127,10 +123,24 @@ proc pos*(this:ISizedStream):Natural =
 proc `pos=`*(this:ISizedStream, value:Natural):void =
     this.setPos(value)
 
+# Перематывает в начало
+proc rewind*(this:ISizedStream):void =
+    this.pos = 0
+
 # Перенаправляет в IWriter
 proc writeBytes*(this:IWriter, data:Bytes):void =
     this.writeBytes(data)
 
+# Записывает значение через IWriter
+proc write*(this:IWriter, T:typedesc[SomeNumber], value:T):void =
+    when T is uint8:
+        this.writeUInt8(value)
+
 # Читает возвращает срез байт
 proc readSlice*(this:IReader, size:Natural):Bytes =
     return this.readSlice(size)
+
+# Читает значение через IReader
+proc read*(this:IReader, T:typedesc[SomeNumber]):T =
+    when T is uint8:
+        return this.readUInt8()
