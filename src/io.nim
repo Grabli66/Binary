@@ -152,7 +152,7 @@ proc writeBytes*(this:IWriter, data:Bytes):void =
 proc write*(this:IWriter, T:typedesc[SomeByte], value:T):void =
     when T is uint8:
         this.writeUInt8(value)
-    when T is int8:
+    elif T is int8:
         this.writeUInt8(value.uint8)
 
 # Читает возвращает срез байт
@@ -163,20 +163,20 @@ proc readSlice*(this:IReader, size:Natural):Bytes =
 proc read*(this:IReader, T:typedesc[SomeByte]):T =
     when T is uint8:
         return this.readUInt8()
-    when T is int8:
+    elif T is int8:
         return this.readUInt8().int8
 
 # Читает значение SomeNotByteNumber через IReader
 proc read*(this:IReader, T:typedesc[SomeNotByteNumber], endian:Endianness):T =
     when T is uint16:
         return this.readUint16(endian)
-    when T is int16:
+    elif T is int16:
         return this.readUint16(endian).int16
-    when T is uint32:
+    elif T is uint32:
         return this.readUint32(endian)
-    when T is int32:
+    elif T is int32:
         return this.readUint32(endian).int32
-    when T is uint64:
+    elif T is uint64:
         return this.readUint64(endian)
-    when T is int64:
+    elif T is int64:
         return this.readUint64(endian).int64
