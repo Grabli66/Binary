@@ -50,5 +50,29 @@ test "memory read uint8":
   const fillBt = 0x03u8
   mem.fill(fillBt)
   mem.rewind()
-  let bt = mem.read(uint8)
-  check bt == fillBt
+  let dat = mem.read(uint8)
+  check dat == fillBt
+
+test "memory read uint16":
+  var mem = newMemory(10)
+  const fillBt = 0x03u8
+  mem.fill(fillBt)
+  mem.rewind()
+  let dat = mem.read(uint16, Endianness.bigEndian)
+  check dat == 0x0303u16
+
+test "memory read uint32":
+  var mem = newMemory(10)
+  const fillBt = 0x03u8
+  mem.fill(fillBt)
+  mem.rewind()
+  let dat = mem.read(uint32, Endianness.bigEndian)
+  check dat == 0x03030303u32
+
+test "memory read uint64":
+  var mem = newMemory(10)
+  const fillBt = 0x03u8
+  mem.fill(fillBt)
+  mem.rewind()
+  let dat = mem.read(uint64, Endianness.bigEndian)
+  check dat == 0x0303030303030303u64

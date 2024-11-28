@@ -24,6 +24,10 @@ type
         readUInt8:proc():uint8
         # Читает uin16
         readUInt16:proc(endian:Endianness):uint16
+        # Читает uin32
+        readUInt32:proc(endian:Endianness):uint32
+        # Читает uin64
+        readUInt64:proc(endian:Endianness):uint64
 
     # Интерфейс для записи данные
     IWriter* = object        
@@ -88,9 +92,16 @@ proc newISizedStream*(
     )
 
 # Создаёт новый IReader
-proc newIReader*(readUInt8:proc():uint8):IReader =
+proc newIReader*(
+        readUInt8:proc():uint8,
+        readUInt16:proc(endian:Endianness):uint16,
+        readUInt32:proc(endian:Endianness):uint32,
+        readUInt64:proc(endian:Endianness):uint64):IReader =
     return IReader(
-        readUInt8:readUInt8
+        readUInt8:readUInt8,
+        readUInt16:readUInt16,
+        readUInt32:readUInt32,
+        readUInt64:readUInt64
     )
 
 # Создаёт новый IWriter
@@ -161,3 +172,11 @@ proc read*(this:IReader, T:typedesc[SomeNotByteNumber], endian:Endianness):T =
         return this.readUint16(endian)
     when T is int16:
         return this.readUint16(endian).int16
+    when T is uint32:
+        return this.readUint32(endian)
+    when T is int32:
+        return this.readUint32(endian).int32
+    when T is uint64:
+        return this.readUint64(endian)
+    when T is int64:
+        return this.readUint64(endian).int64
