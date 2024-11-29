@@ -15,8 +15,15 @@ type
         getPos:proc():Natural
         # Устанавливает позицию для чтения
         setPos:proc(pos:Natural):void
+    
+    # Поток данных с таймаутом
+    IStreamWithTimeout* = object
+        # Возвращает таймаут в миллисекундах
+        getTimeoutMs:proc():Natural
+        # Устанавливает таймаут в миллисекундах
+        setTimeoutMs:proc(value:Natural):void
 
-    # Интерфейс для чтения данных
+    # Интерфейс для синхронного чтения данных
     IReader* = object
         # Читает возвращает срез байт
         readSlice:proc(size:Natural):Bytes
@@ -29,7 +36,7 @@ type
         # Читает uin64
         readUInt64:proc(endian:Endianness):uint64
 
-    # Интерфейс для записи данные
+    # Интерфейс для синхронной записи данные
     IWriter* = object        
         # Записывает срез байт
         writeSlice:proc(data:Bytes):void        
@@ -42,12 +49,27 @@ type
         # Записывает UInt64
         writeUInt64:proc(value:uint64):void
 
-    # Ввод-вывод
+    # Интерфейс для асинхронного чтения данных
+    IReaderAsync* = object
+
+    # Интерфейс для асинхронной записи данные
+    IWriterAsync* = object
+        
+    # Синхронный ввод-вывод
     IO* = object
         # Читает данные
         reader:IReader
         # Записывает данные
         writer:IWriter
+
+    # Асинхронный ввод-вывод
+    IOAsync* = object
+        # Настройки таймаутов
+        timeout:IStreamWithTimeout
+        # Читает данные
+        reader:IReaderAsync
+        # Записывает данные
+        writer:IWriterAsync
 
     # Ввод-вывод с известной длинной
     IOSized* = object
@@ -192,3 +214,11 @@ proc read*(this:IReader, T:typedesc[SomeNotByteNumber], endian:Endianness):T =
         return this.readUint64(endian)
     elif T is int64:
         return this.readUint64(endian).int64
+
+# Создаёт IOAsync
+proc newIOAsync*(timeout:IStreamWithTimeout, reader:IReaderAsync, writer:IWriterAsync):IOAsync =
+    return IOAsync(
+        timeout:timeout,
+        reader:reader,
+        writer:writer
+    )
