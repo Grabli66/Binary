@@ -32,9 +32,15 @@ type
     # Интерфейс для записи данные
     IWriter* = object        
         # Записывает срез байт
-        writeBytes:proc(data:Bytes):void        
+        writeSlice:proc(data:Bytes):void        
         # Записывает UInt8
         writeUInt8:proc(value:uint8):void
+        # Записывает UInt16
+        writeUInt16:proc(value:uint16):void
+        # Записывает UInt32
+        writeUInt32:proc(value:uint32):void
+        # Записывает UInt64
+        writeUInt64:proc(value:uint64):void
 
     # Ввод-вывод
     IO* = object
@@ -106,11 +112,17 @@ proc newIReader*(
 
 # Создаёт новый IWriter
 proc newIWriter*(
-        writeBytes:proc(data:Bytes):void,
-        writeUInt8:proc(value:uint8):void):IWriter =
+        writeSlice:proc(data:Bytes):void,
+        writeUInt8:proc(value:uint8):void,
+        writeUInt16:proc(value:uint16):void,
+        writeUInt32:proc(value:uint32):void,
+        writeUInt64:proc(value:uint64):void):IWriter =
     return IWriter(
-        writeBytes:writeBytes,
-        writeUInt8:writeUInt8
+        writeSlice:writeSlice,
+        writeUInt8:writeUInt8,
+        writeUInt16:writeUInt16,
+        writeUInt32:writeUInt32,
+        writeUInt64:writeUInt64
     )
 
 # Создаёт новое IO
@@ -145,8 +157,8 @@ proc rewind*(this:ISizedStream):void =
     this.pos = 0
 
 # Перенаправляет в IWriter
-proc writeBytes*(this:IWriter, data:Bytes):void =
-    this.writeBytes(data)
+proc writeSlice*(this:IWriter, data:Bytes):void =
+    this.writeSlice(data)
 
 # Записывает SomeByte значение через IWriter
 proc write*(this:IWriter, T:typedesc[SomeByte], value:T):void =

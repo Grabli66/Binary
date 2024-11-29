@@ -60,10 +60,11 @@ proc newMemoryReader(memdata:MemoryData):io.IReader =
                memdata.pos += 1
                return res
           ,
-          readUInt16 = proc(endian:Endianness):uint16 =
+          readUInt16 = proc(endian:Endianness):uint16 =               
                let buffer = toUnchecked(memdata.buffer)
                let b1 = buffer[memdata.pos].uint16
                let b2 = buffer[memdata.pos+1].uint16
+               memdata.pos += 2
                if endian == Endianness.bigEndian:
                     return ((b1 shl 8) + b2).uint16
                else:
@@ -75,6 +76,7 @@ proc newMemoryReader(memdata:MemoryData):io.IReader =
                let b2 = buffer[memdata.pos+1].uint32
                let b3 = buffer[memdata.pos+2].uint32
                let b4 = buffer[memdata.pos+3].uint32
+               memdata.pos += 4
                if endian == Endianness.bigEndian:
                     return ((b1 shl 24) + (b2 shl 16) + (b3 shl 8) + b4).uint32
                else:
@@ -90,6 +92,7 @@ proc newMemoryReader(memdata:MemoryData):io.IReader =
                let b6 = buffer[memdata.pos+5].uint64
                let b7 = buffer[memdata.pos+6].uint64
                let b8 = buffer[memdata.pos+7].uint64
+               memdata.pos += 8
                if endian == Endianness.bigEndian:
                     return ((b1 shl 56) + (b2 shl 48) + (b3 shl 40) + (b4 shl 32) + (b5 shl 24) + (b6 shl 16) + (b7 shl 8) + b8).uint64
                else:
@@ -99,7 +102,7 @@ proc newMemoryReader(memdata:MemoryData):io.IReader =
 # Создаёт интерфейс записи в память
 proc newMemoryWriter(memdata:MemoryData):io.IWriter =
      return io.newIWriter(
-          writeBytes = proc(data:Bytes):void =
+          writeSlice = proc(data:Bytes):void =
                prepareSize(memdata, data.len)
                copyMem(memdata.buffer, data.toUnsafe(), data.len)
                memdata.pos += data.len
@@ -109,6 +112,15 @@ proc newMemoryWriter(memdata:MemoryData):io.IWriter =
                var buff = cast[ptr UncheckedArray[uint8]](memdata.buffer)
                buff[memdata.pos] = value
                memdata.pos += 1
+          ,
+          writeUInt16 = proc(value:uint16):void =
+               discard
+          ,
+          writeUInt32 = proc(value:uint32):void =
+               discard
+          ,
+          writeUInt64 = proc(value:uint64):void =
+               discard
      )
 
 # Создаёт интерфейс для ISizedStream
