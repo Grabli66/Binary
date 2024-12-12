@@ -1,3 +1,5 @@
+import asyncdispatch
+
 import slice
 
 type
@@ -51,6 +53,8 @@ type
 
     # Интерфейс для асинхронного чтения данных
     IReaderAsync* = object
+        # Читает возвращает срез байт
+        readSlice:proc(size:Natural):Future[Bytes]
 
     # Интерфейс для асинхронной записи данные
     IWriterAsync* = object
@@ -119,6 +123,16 @@ proc newISizedStream*(
         setPos:setPos
     )
 
+# Создаёт IStreamWithTimeout
+proc newIStreamWithTimeout*(
+            getTimeoutMs:proc():Natural,
+            setTimeoutMs:proc(value:Natural):void
+        ):IStreamWithTimeout = 
+    return IStreamWithTimeout(
+        getTimeoutMs:getTimeoutMs,
+        setTimeoutMs:setTimeoutMs
+    )
+
 # Создаёт новый IReader
 proc newIReader*(
         readUInt8:proc():uint8,
@@ -146,6 +160,10 @@ proc newIWriter*(
         writeUInt32:writeUInt32,
         writeUInt64:writeUInt64
     )
+
+# Создаёт новый IReaderAsync
+proc newIReaderAsync*():IReaderAsync =
+    discard
 
 # Создаёт новое IO
 proc newIO*(reader:IReader, writer:IWriter):IO =
